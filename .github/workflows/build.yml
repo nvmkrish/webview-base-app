@@ -30,7 +30,7 @@ jobs:
 
     - name: Replace Website URL
       run: |
-        sed -i 's|https://example.com|${{ github.event.inputs.web_url }}|g' app/build.gradle
+        sed -i 's|https://example.com|${{ github.event.inputs.web_url }}|g' app/build.gradle.kts
 
     - name: Replace App Name
       run: |
