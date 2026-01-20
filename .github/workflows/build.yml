@@ -28,6 +28,10 @@ jobs:
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/upload-keystore.jks
 
+    - name: Replace Website URL
+      run: |
+        sed -i 's|https://example.com|${{ github.event.inputs.web_url }}|g' app/build.gradle
+
     - name: Replace App Name
       run: |
         sed -i 's|<string name="app_name">.*</string>|<string name="app_name">${{ github.event.inputs.app_name }}</string>|g' app/src/main/res/values/strings.xml
