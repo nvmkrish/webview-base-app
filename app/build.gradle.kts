@@ -12,6 +12,18 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // 🔴 THIS IS REQUIRED
+        buildConfigField(
+            "String",
+            "WEB_URL",
+            "\"https://example.com\""
+        )
+    }
+
+    // 🔴 THIS IS REQUIRED
+    buildFeatures {
+        buildConfig = true
     }
 
     signingConfigs {
