@@ -1,4 +1,5 @@
 package com.example.webviewapp;
+import com.example.webviewapp.BuildConfig;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;
