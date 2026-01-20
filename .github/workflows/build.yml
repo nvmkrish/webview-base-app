@@ -1,0 +1,54 @@
+name: Build Signed Android WebView APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      web_url:
+        description: Website URL
+        required: true
+      app_name:
+        description: App Name
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/upload-keystore.jks
+
+    - name: Replace Website URL
+      run: |
+        sed -i 's|https://example.com|${{ github.event.inputs.web_url }}|g' app/build.gradle.kts
+
+    - name: Replace App Name
+      run: |
+        sed -i 's|<string name="app_name">.*</string>|<string name="app_name">${{ github.event.inputs.app_name }}</string>|g' app/src/main/res/values/strings.xml
+
+    - name: Grant Execute Permission
+      run: chmod +x gradlew
+
+    - name: Build Signed Release APK
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      run: |
+        ./gradlew assembleRelease
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: signed-apk
+        path: app/build/outputs/apk/release/app-release.apk
