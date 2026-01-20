@@ -14,7 +14,12 @@ android {
         versionName = "1.0"
 
         // 🔴 THIS IS REQUIRED
-        buildConfigField "String", "WEB_URL", "\"https://example.com\""
+        buildConfigField(
+            "String",
+            "WEB_URL",
+            "\"https://example.com\""
+            )
+
     }
 
     // 🔴 THIS IS REQUIRED
