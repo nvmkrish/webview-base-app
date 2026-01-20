@@ -52,4 +52,6 @@ android {
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation("androidx.browser:browser:1.8.0")
+
 }
