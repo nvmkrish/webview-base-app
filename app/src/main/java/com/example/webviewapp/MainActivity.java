@@ -44,15 +44,17 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient());
 
         // ✅ SAFE URL HANDLING
-        String url = BuildConfig.WEB_URL;
-        if (url == null || url.trim().isEmpty()) {
-            url = "https://google.com";
+        String tempUrl = BuildConfig.WEB_URL;
+        if (tempUrl == null || tempUrl.trim().isEmpty()) {
+            tempUrl = "https://google.com";
         }
 
-        // ✅ DELAY LOAD (FIXES FIRST OPEN CRASH)
+        final String finalUrl = tempUrl;
+
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            webView.loadUrl(url);
+            webView.loadUrl(finalUrl);
         }, 200);
+
 
         // ✅ Back navigation
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
