@@ -1,6 +1,8 @@
 package com.example.webviewapp;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -21,7 +23,10 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
 
-        // ✅ Enable cookies (CRITICAL)
+        // ✅ Enable WebView debugging (safe)
+        WebView.setWebContentsDebuggingEnabled(true);
+
+        // ✅ Enable cookies
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         cookieManager.setAcceptThirdPartyCookies(webView, true);
@@ -38,8 +43,16 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
 
-        // ✅ Load site
-        webView.loadUrl(BuildConfig.WEB_URL);
+        // ✅ SAFE URL HANDLING
+        String url = BuildConfig.WEB_URL;
+        if (url == null || url.trim().isEmpty()) {
+            url = "https://google.com";
+        }
+
+        // ✅ DELAY LOAD (FIXES FIRST OPEN CRASH)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            webView.loadUrl(url);
+        }, 200);
 
         // ✅ Back navigation
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
