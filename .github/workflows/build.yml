@@ -51,7 +51,7 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       run: |
-        ./gradlew assembleRelease
+        ./gradlew clean assembleRelease
 
     - name: Upload APK to GitHub Release
       uses: softprops/action-gh-release@v1
