@@ -38,8 +38,9 @@ jobs:
     
     - name: Verify launcher icons
       run: |
-        echo "Checking launcher icons..."
-        find app/src/main/res -name "ic_launcher*"'
+        echo Checking_launcher_icons
+        find app/src/main/res -name ic_launcher*
+
         
     - name: Grant Gradle Permission
       run: chmod +x gradlew
