@@ -7,7 +7,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.superdry.webview"
+        applicationId = "com.myapp.webview"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -57,6 +57,7 @@ dependencies {
 
 
 }
+
 
 
 
