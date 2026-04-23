@@ -62,11 +62,12 @@ public class MainActivity extends AppCompatActivity {
         webView = new WebView(this);
         webView.setId(View.generateViewId());
 
-        // Add status bar top padding so content doesn't overlap system bar
+        // Transparent top margin (status bar) + we'll set bottom later once we know nav height
         int statusBarHeight = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        webView.setPadding(0, statusBarHeight + dp(6), 0, 0);
+        final int topPadPx = statusBarHeight + dp(8);
+        webView.setPadding(0, topPadPx, 0, 0); // bottom padding set after nav is built
 
         RelativeLayout.LayoutParams webParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT, 
@@ -95,7 +96,10 @@ public class MainActivity extends AppCompatActivity {
                     navContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     rootLayout.addView(navContainer, navContainerParams);
 
-                    // Nav floats OVER the webview (transparent background — webview stays full height)
+                    // Nav floats OVER the webview — add transparent bottom padding so
+                    // webpage content scrolls above the pill and isn't hidden behind it
+                    int bottomPadPx = pillHeightPx + bottomMarginPx + dp(8);
+                    webView.setPadding(0, topPadPx, 0, bottomPadPx);
 
                     // --- Pill background ---
                     LinearLayout pill = new LinearLayout(this);
@@ -289,6 +293,22 @@ public class MainActivity extends AppCompatActivity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
         webView.setWebViewClient(new WebViewClient() {
+            private boolean tokenRetrySent = false;
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // Retry FCM token registration after first page load
+                // (in case the initial attempt on launch failed due to cold-start network)
+                if (!tokenRetrySent && BuildConfig.ENABLE_PUSH) {
+                    tokenRetrySent = true;
+                    FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token -> {
+                        Log.d("FCM_DEBUG", "Token: " + token);
+                        Log.d("FCM_DEBUG", "Backend: " + BuildConfig.BACKEND_URL);
+                        sendTokenToBackend(token);
+                    });
+                }
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
