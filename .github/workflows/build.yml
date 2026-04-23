@@ -99,25 +99,6 @@ jobs:
       run: |
         sed -i 's|<string name="app_name">.*</string>|<string name="app_name">${{ github.event.inputs.app_name }}</string>|g' app/src/main/res/values/strings.xml
 
-    - name: Replace BuildConfig Fields
-      run: |
-        sed -i "s|buildConfigField(\"String\", \"WEB_URL\", \".*\")|buildConfigField(\"String\", \"WEB_URL\", '\"${{ github.event.inputs.web_url }}\"')|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"String\", \"SPLASH_COLOR\", \".*\")|buildConfigField(\"String\", \"SPLASH_COLOR\", '\"${{ github.event.inputs.splash_color }}\"')|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"String\", \"SPLASH_LOGO_URL\", \".*\")|buildConfigField(\"String\", \"SPLASH_LOGO_URL\", '\"${{ github.event.inputs.splash_logo_url }}\"')|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_PUSH\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_PUSH\", \"${{ github.event.inputs.enable_push }}\")|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_BOTTOM_NAV\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_BOTTOM_NAV\", \"${{ github.event.inputs.enable_bottom_nav }}\")|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_CAMERA\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_CAMERA\", \"${{ github.event.inputs.enable_camera }}\")|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_LOCATION\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_LOCATION\", \"${{ github.event.inputs.enable_location }}\")|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_SHARE\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_SHARE\", \"${{ github.event.inputs.enable_share }}\")|g" app/build.gradle.kts
-        
-        # JSON needs special escaping so using # as delimiter in sed
-        json='${{ github.event.inputs.nav_items_json }}'
-        sed -i "s#buildConfigField(\"String\", \"NAV_ITEMS_JSON\", \".*\")#buildConfigField(\"String\", \"NAV_ITEMS_JSON\", '\"'"\$json"'\"')#g" app/build.gradle.kts
-        
-        sed -i "s|buildConfigField(\"String\", \"APP_ID\", \".*\")|buildConfigField(\"String\", \"APP_ID\", '\"${{ github.event.inputs.app_id }}\"')|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"String\", \"BACKEND_URL\", \".*\")|buildConfigField(\"String\", \"BACKEND_URL\", '\"${{ github.event.inputs.backend_url }}\"')|g" app/build.gradle.kts
-        sed -i "s|buildConfigField(\"String\", \"APP_NAME\", \".*\")|buildConfigField(\"String\", \"APP_NAME\", '\"${{ github.event.inputs.app_name }}\"')|g" app/build.gradle.kts
-
     - name: Verify launcher icons
       run: |
         echo Checking_launcher_icons
