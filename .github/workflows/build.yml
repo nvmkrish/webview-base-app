@@ -9,6 +9,39 @@ on:
       app_name:
         description: App Name
         required: true
+      splash_color:
+        description: Splash Color
+        required: false
+      splash_logo_url:
+        description: Splash Logo URL
+        required: false
+      enable_push:
+        description: Enable Push Notifications
+        required: false
+      enable_bottom_nav:
+        description: Enable Bottom Navigation
+        required: false
+      enable_camera:
+        description: Enable Camera Access
+        required: false
+      enable_location:
+        description: Enable Location Access
+        required: false
+      enable_share:
+        description: Enable Share Button
+        required: false
+      nav_items_json:
+        description: Navigation Items JSON
+        required: false
+      app_id:
+        description: App ID
+        required: false
+      backend_url:
+        description: Backend URL
+        required: false
+      fcm_project_id:
+        description: FCM Project ID
+        required: false
 
 jobs:
   build:
@@ -28,14 +61,63 @@ jobs:
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/upload-keystore.jks
 
-    - name: Replace Website URL
+    - name: Generate google-services.json
+      if: ${{ github.event.inputs.fcm_project_id != '' }}
       run: |
-        sed -i 's|https://example.com|${{ github.event.inputs.web_url }}|g' app/build.gradle.kts
+        cat <<EOF > app/google-services.json
+        {
+          "project_info": {
+            "project_number": "123456789",
+            "project_id": "${{ github.event.inputs.fcm_project_id }}"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789:android:123456789",
+                "android_client_info": {
+                  "package_name": "com.example.webviewapp"
+                }
+              },
+              "oauth_client": [],
+              "api_key": [
+                {
+                  "current_key": "${{ secrets.FCM_API_KEY }}"
+                }
+              ],
+              "services": {
+                "appinvite_service": {
+                  "other_platform_oauth_client": []
+                }
+              }
+            }
+          ],
+          "configuration_version": "1"
+        }
+        EOF
 
     - name: Replace App Name
       run: |
         sed -i 's|<string name="app_name">.*</string>|<string name="app_name">${{ github.event.inputs.app_name }}</string>|g' app/src/main/res/values/strings.xml
-    
+
+    - name: Replace BuildConfig Fields
+      run: |
+        sed -i "s|buildConfigField(\"String\", \"WEB_URL\", \".*\")|buildConfigField(\"String\", \"WEB_URL\", '\"${{ github.event.inputs.web_url }}\"')|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"String\", \"SPLASH_COLOR\", \".*\")|buildConfigField(\"String\", \"SPLASH_COLOR\", '\"${{ github.event.inputs.splash_color }}\"')|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"String\", \"SPLASH_LOGO_URL\", \".*\")|buildConfigField(\"String\", \"SPLASH_LOGO_URL\", '\"${{ github.event.inputs.splash_logo_url }}\"')|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_PUSH\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_PUSH\", \"${{ github.event.inputs.enable_push }}\")|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_BOTTOM_NAV\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_BOTTOM_NAV\", \"${{ github.event.inputs.enable_bottom_nav }}\")|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_CAMERA\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_CAMERA\", \"${{ github.event.inputs.enable_camera }}\")|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_LOCATION\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_LOCATION\", \"${{ github.event.inputs.enable_location }}\")|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"Boolean\", \"ENABLE_SHARE\", \".*\")|buildConfigField(\"Boolean\", \"ENABLE_SHARE\", \"${{ github.event.inputs.enable_share }}\")|g" app/build.gradle.kts
+        
+        # JSON needs special escaping so using # as delimiter in sed
+        json='${{ github.event.inputs.nav_items_json }}'
+        sed -i "s#buildConfigField(\"String\", \"NAV_ITEMS_JSON\", \".*\")#buildConfigField(\"String\", \"NAV_ITEMS_JSON\", '\"'"\$json"'\"')#g" app/build.gradle.kts
+        
+        sed -i "s|buildConfigField(\"String\", \"APP_ID\", \".*\")|buildConfigField(\"String\", \"APP_ID\", '\"${{ github.event.inputs.app_id }}\"')|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"String\", \"BACKEND_URL\", \".*\")|buildConfigField(\"String\", \"BACKEND_URL\", '\"${{ github.event.inputs.backend_url }}\"')|g" app/build.gradle.kts
+        sed -i "s|buildConfigField(\"String\", \"APP_NAME\", \".*\")|buildConfigField(\"String\", \"APP_NAME\", '\"${{ github.event.inputs.app_name }}\"')|g" app/build.gradle.kts
+
     - name: Verify launcher icons
       run: |
         echo Checking_launcher_icons

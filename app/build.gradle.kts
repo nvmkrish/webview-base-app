@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -14,11 +15,19 @@ android {
         versionName = "1.0"
 
         // 🔴 THIS IS REQUIRED
-        buildConfigField(
-            "String",
-            "WEB_URL",
-            "\"https://example.com\""
-            )
+        buildConfigField("String", "WEB_URL", "\"https://example.com\"")
+        buildConfigField("String", "SPLASH_COLOR", "\"#534AB7\"")
+        buildConfigField("String", "SPLASH_LOGO_URL", "\"\"")
+        buildConfigField("String", "SPLASH_TEXT", "\"\"")
+        buildConfigField("Boolean", "ENABLE_PUSH", "false")
+        buildConfigField("Boolean", "ENABLE_BOTTOM_NAV", "false")
+        buildConfigField("Boolean", "ENABLE_CAMERA", "false")
+        buildConfigField("Boolean", "ENABLE_LOCATION", "false")
+        buildConfigField("Boolean", "ENABLE_SHARE", "false")
+        buildConfigField("String", "NAV_ITEMS_JSON", "\"[]\"")
+        buildConfigField("String", "APP_ID", "\"\"")
+        buildConfigField("String", "BACKEND_URL", "\"\"")
+        buildConfigField("String", "APP_NAME", "\"WebView App\"")
 
     }
 
@@ -54,7 +63,12 @@ dependencies {
     implementation(libs.material)
     implementation("androidx.browser:browser:1.8.0")
     
+    // Add Firebase BOM and Messaging
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
+    // Add Glide for image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
 }
 

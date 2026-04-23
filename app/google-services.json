@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "879896391279",
+    "project_id": "easyway-81cec",
+    "storage_bucket": "easyway-81cec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879896391279:android:10f68ea2e59ec62bb0679a",
+        "android_client_info": {
+          "package_name": "com.easyway.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxRiN2zpM5PLRwp0cv05b79FSP9rKitOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
