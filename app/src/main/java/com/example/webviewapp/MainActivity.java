@@ -60,7 +60,13 @@ public class MainActivity extends AppCompatActivity {
 
         webView = new WebView(this);
         webView.setId(View.generateViewId());
-        
+
+        // Add status bar top padding so content doesn't overlap system bar
+        int statusBarHeight = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        webView.setPadding(0, statusBarHeight + dp(6), 0, 0);
+
         RelativeLayout.LayoutParams webParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT, 
             RelativeLayout.LayoutParams.MATCH_PARENT
@@ -88,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     navContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     rootLayout.addView(navContainer, navContainerParams);
 
-                    // Webview stops above the nav container
-                    webParams.addRule(RelativeLayout.ABOVE, navContainer.getId());
-                    webView.setLayoutParams(webParams);
+                    // Nav floats OVER the webview (transparent background — webview stays full height)
 
                     // --- Pill background ---
                     LinearLayout pill = new LinearLayout(this);
@@ -99,11 +103,11 @@ public class MainActivity extends AppCompatActivity {
                     pill.setId(View.generateViewId());
 
                     GradientDrawable pillBg = new GradientDrawable();
-                    pillBg.setColor(Color.WHITE);
+                    pillBg.setColor(Color.argb(220, 255, 255, 255)); // semi-transparent white
                     pillBg.setCornerRadius(dp(40));
                     pillBg.setStroke(dp(1), Color.parseColor("#E5E7EB"));
                     pill.setBackground(pillBg);
-                    pill.setElevation(dp(8));
+                    pill.setElevation(dp(12));
                     pill.setPadding(dp(6), dp(6), dp(6), dp(6));
 
                     FrameLayout.LayoutParams pillParams = new FrameLayout.LayoutParams(
