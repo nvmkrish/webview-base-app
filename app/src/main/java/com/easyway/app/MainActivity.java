@@ -29,6 +29,10 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import android.view.Gravity;
+import android.os.Build;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.google.firebase.messaging.FirebaseMessaging;
