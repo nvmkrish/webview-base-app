@@ -8,7 +8,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.easyway.app"
+        applicationId = "com.myapp.webview"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -71,6 +71,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
 }
+
 
 
 
