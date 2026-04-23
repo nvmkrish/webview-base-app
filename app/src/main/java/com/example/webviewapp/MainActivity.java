@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) statusBarHeight = getResources().getDimensionPixelSize(resourceId);
         final int topPadPx = statusBarHeight + dp(8);
-        webView.setPadding(0, topPadPx, 0, 0); // bottom padding set after nav is built
 
         RelativeLayout.LayoutParams webParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT, 
@@ -96,10 +95,10 @@ public class MainActivity extends AppCompatActivity {
                     navContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     rootLayout.addView(navContainer, navContainerParams);
 
-                    // Nav floats OVER the webview — add transparent bottom padding so
-                    // webpage content scrolls above the pill and isn't hidden behind it
+                    // Add physical margins so content doesn't hide behind the pill or status bar
                     int bottomPadPx = pillHeightPx + bottomMarginPx + dp(8);
-                    webView.setPadding(0, topPadPx, 0, bottomPadPx);
+                    webParams.setMargins(0, topPadPx, 0, bottomPadPx);
+                    webView.setLayoutParams(webParams);
 
                     // --- Pill background ---
                     LinearLayout pill = new LinearLayout(this);
@@ -292,6 +291,11 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowContentAccess(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
+        // ✅ Bypass Google OAuth WebView Block by making the User-Agent look like Chrome
+        String userAgent = settings.getUserAgentString();
+        userAgent = userAgent.replace("; wv", "");
+        settings.setUserAgentString(userAgent);
+
         webView.setWebViewClient(new WebViewClient() {
             private boolean tokenRetrySent = false;
 
@@ -312,26 +316,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
-
-                // ✅ Open Google OAuth in Chrome Custom Tabs (WebView blocks it by design)
-                if (url.contains("accounts.google.com")
-                        || url.contains("google.com/oauth")
-                        || url.contains("google.com/o/oauth2")
-                        || url.contains("appleid.apple.com")
-                        || url.contains("facebook.com/login")
-                        || url.contains("facebook.com/dialog/oauth")) {
-                    try {
-                        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
-                            .setShowTitle(true)
-                            .build();
-                        customTabsIntent.launchUrl(MainActivity.this, request.getUrl());
-                    } catch (Exception e) {
-                        // Fallback: open in any browser
-                        Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
-                        startActivity(intent);
-                    }
-                    return true;
-                }
 
                 // Open deep links in their native apps
                 if (url.startsWith("mailto:") || url.startsWith("tel:")
