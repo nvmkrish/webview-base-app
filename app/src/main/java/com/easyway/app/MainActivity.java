@@ -409,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; utf-8");
                 conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("ngrok-skip-browser-warning", "true");
                 conn.setDoOutput(true);
                 
                 String jsonInputString = "{\"token\":\"" + token + "\", \"deviceId\":\"" + deviceId + "\"}";
