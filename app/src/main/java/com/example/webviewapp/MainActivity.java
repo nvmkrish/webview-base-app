@@ -1,4 +1,4 @@
-package com.example.webviewapp;
+package com.easyway.app;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
@@ -52,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Request Notification Permission for Android 13+ (API 33+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
         
         RelativeLayout rootLayout = new RelativeLayout(this);
         rootLayout.setLayoutParams(new RelativeLayout.LayoutParams(

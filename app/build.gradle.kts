@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.webviewapp"
+    namespace = "com.easyway.app"
     compileSdk = 36
 
     defaultConfig {

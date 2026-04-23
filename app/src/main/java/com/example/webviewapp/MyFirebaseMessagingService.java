@@ -1,4 +1,4 @@
-package com.example.webviewapp;
+package com.easyway.app;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,6 +24,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
+        Log.d("FCM_TOKEN", "Token: " + token);
         sendTokenToBackend(token);
     }
 
