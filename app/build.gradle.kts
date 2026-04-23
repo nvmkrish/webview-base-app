@@ -15,19 +15,19 @@ android {
         versionName = "1.0"
 
         // 🔴 THIS IS REQUIRED
-        buildConfigField("String", "WEB_URL", "\"https://example.com\"")
-        buildConfigField("String", "SPLASH_COLOR", "\"#534AB7\"")
+        buildConfigField("String", "WEB_URL", "\"https://claude.ai/\"")
+        buildConfigField("String", "SPLASH_COLOR", "\"#000000\"")
         buildConfigField("String", "SPLASH_LOGO_URL", "\"\"")
-        buildConfigField("String", "SPLASH_TEXT", "\"\"")
-        buildConfigField("Boolean", "ENABLE_PUSH", "false")
-        buildConfigField("Boolean", "ENABLE_BOTTOM_NAV", "false")
+        buildConfigField("String", "SPLASH_TEXT", "\"Claude\"")
+        buildConfigField("Boolean", "ENABLE_PUSH", "true")
+        buildConfigField("Boolean", "ENABLE_BOTTOM_NAV", "true")
         buildConfigField("Boolean", "ENABLE_CAMERA", "false")
         buildConfigField("Boolean", "ENABLE_LOCATION", "false")
         buildConfigField("Boolean", "ENABLE_SHARE", "false")
-        buildConfigField("String", "NAV_ITEMS_JSON", "\"[]\"")
-        buildConfigField("String", "APP_ID", "\"\"")
-        buildConfigField("String", "BACKEND_URL", "\"\"")
-        buildConfigField("String", "APP_NAME", "\"WebView App\"")
+        buildConfigField("String", "NAV_ITEMS_JSON", "\"[{\"label\":\"Home\",\"path\":\"https://claude.ai/\"},{\"label\":\"Chats\",\"path\":\"https://claude.ai/recents\"},{\"label\":\"User\",\"path\":\"https://claude.ai/settings/general\"}]\"")
+        buildConfigField("String", "APP_ID", "\"claudeapp\"")
+        buildConfigField("String", "BACKEND_URL", "\"https://jacquie-unevocable-adaline.ngrok-free.dev\"")
+        buildConfigField("String", "APP_NAME", "\"Claude App\"")
 
     }
 
