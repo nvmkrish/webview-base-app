@@ -24,10 +24,10 @@ android {
         buildConfigField("Boolean", "ENABLE_CAMERA", "false")
         buildConfigField("Boolean", "ENABLE_LOCATION", "false")
         buildConfigField("Boolean", "ENABLE_SHARE", "false")
-        buildConfigField("String", "NAV_ITEMS_JSON", "\"[{\\\"label\\\":\\\"Home\\\",\\\"path\\\":\\\"https://claude.ai/\\\"},{\\\"label\\\":\\\"Chats\\\",\\\"path\\\":\\\"https://claude.ai/recents\\\"},{\\\"label\\\":\\\"Accounts\\\",\\\"path\\\":\\\"https://claude.ai/settings/general\\\"}]\"")
-        buildConfigField("String", "APP_ID", "\"claudeapp\"")
+        buildConfigField("String", "NAV_ITEMS_JSON", "\"[{\\\"label\\\":\\\"Home\\\",\\\"path\\\":\\\"https://claude.ai/new\\\"},{\\\"label\\\":\\\"Chats\\\",\\\"path\\\":\\\"https://claude.ai/recents\\\"},{\\\"label\\\":\\\"Accounts\\\",\\\"path\\\":\\\"https://claude.ai/settings/general\\\"}]\"")
+        buildConfigField("String", "APP_ID", "\"claude\"")
         buildConfigField("String", "BACKEND_URL", "\"https://jacquie-unevocable-adaline.ngrok-free.dev\"")
-        buildConfigField("String", "APP_NAME", "\"Claude App\"")
+        buildConfigField("String", "APP_NAME", "\"Claude\"")
 
     }
 
