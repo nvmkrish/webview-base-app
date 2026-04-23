@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
                 URL url = new URL(BuildConfig.BACKEND_URL + "/api/apps/" + BuildConfig.APP_ID + "/fcm-token");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json; utf-8");
+                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setRequestProperty("ngrok-skip-browser-warning", "true");
                 conn.setDoOutput(true);
