@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -291,6 +292,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
+
+                // ✅ Open Google OAuth in Chrome Custom Tabs (WebView blocks it by design)
+                if (url.contains("accounts.google.com")
+                        || url.contains("google.com/oauth")
+                        || url.contains("google.com/o/oauth2")
+                        || url.contains("appleid.apple.com")
+                        || url.contains("facebook.com/login")
+                        || url.contains("facebook.com/dialog/oauth")) {
+                    try {
+                        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
+                            .setShowTitle(true)
+                            .build();
+                        customTabsIntent.launchUrl(MainActivity.this, request.getUrl());
+                    } catch (Exception e) {
+                        // Fallback: open in any browser
+                        Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                        startActivity(intent);
+                    }
+                    return true;
+                }
+
+                // Open deep links in their native apps
                 if (url.startsWith("mailto:") || url.startsWith("tel:")
                         || url.startsWith("whatsapp:") || url.startsWith("intent:")) {
                     try {
@@ -299,7 +322,8 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {}
                     return true;
                 }
-                return false; // all http/https load inside WebView
+
+                return false; // all other http/https load inside WebView
             }
         });
 
