@@ -1,4 +1,4 @@
-package com.example.webviewapp;
+package com.easyway.app;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.webviewapp;
+package com.easyway.app;
 
 import android.content.Intent;
 import android.graphics.Color;
