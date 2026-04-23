@@ -1,28 +1,35 @@
 package com.example.webviewapp;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.provider.Settings;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
@@ -32,8 +39,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import android.provider.Settings;
-import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,44 +67,200 @@ public class MainActivity extends AppCompatActivity {
         );
         rootLayout.addView(webView, webParams);
 
-        // Add Bottom Navigation if enabled
+        // Add Floating Pill Bottom Navigation if enabled
         if (BuildConfig.ENABLE_BOTTOM_NAV) {
             try {
                 JSONArray navItems = new JSONArray(BuildConfig.NAV_ITEMS_JSON);
-                if (navItems.length() > 0) {
-                    BottomNavigationView bottomNav = new BottomNavigationView(this);
-                    bottomNav.setId(View.generateViewId());
-                    
-                    RelativeLayout.LayoutParams navParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT, 
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
+                int count = Math.min(navItems.length(), 3); // cap at 3 tabs
+                if (count > 0) {
+
+                    // --- Outer container for the pill (provides bottom margin) ---
+                    FrameLayout navContainer = new FrameLayout(this);
+                    navContainer.setId(View.generateViewId());
+                    int bottomMarginPx = dp(16);
+                    int sidePadPx    = dp(20);
+                    int pillHeightPx = dp(64);
+
+                    RelativeLayout.LayoutParams navContainerParams = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.MATCH_PARENT,
+                        pillHeightPx + bottomMarginPx
                     );
-                    navParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    rootLayout.addView(bottomNav, navParams);
-                    
-                    webParams.addRule(RelativeLayout.ABOVE, bottomNav.getId());
+                    navContainerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    rootLayout.addView(navContainer, navContainerParams);
+
+                    // Webview stops above the nav container
+                    webParams.addRule(RelativeLayout.ABOVE, navContainer.getId());
                     webView.setLayoutParams(webParams);
-                    
-                    Menu menu = bottomNav.getMenu();
-                    for (int i = 0; i < navItems.length(); i++) {
+
+                    // --- Pill background ---
+                    LinearLayout pill = new LinearLayout(this);
+                    pill.setOrientation(LinearLayout.HORIZONTAL);
+                    pill.setGravity(Gravity.CENTER_VERTICAL);
+                    pill.setId(View.generateViewId());
+
+                    GradientDrawable pillBg = new GradientDrawable();
+                    pillBg.setColor(Color.WHITE);
+                    pillBg.setCornerRadius(dp(40));
+                    pillBg.setStroke(dp(1), Color.parseColor("#E5E7EB"));
+                    pill.setBackground(pillBg);
+                    pill.setElevation(dp(8));
+                    pill.setPadding(dp(6), dp(6), dp(6), dp(6));
+
+                    FrameLayout.LayoutParams pillParams = new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, pillHeightPx
+                    );
+                    pillParams.leftMargin  = sidePadPx;
+                    pillParams.rightMargin = sidePadPx;
+                    pillParams.gravity     = Gravity.BOTTOM;
+                    pillParams.bottomMargin = bottomMarginPx;
+                    navContainer.addView(pill, pillParams);
+
+                    // --- Sliding indicator (added first so it's behind tab buttons) ---
+                    View indicator = new View(this);
+                    GradientDrawable indicatorBg = new GradientDrawable();
+                    indicatorBg.setColor(Color.parseColor("#1A3B82FF")); // blue tint
+                    indicatorBg.setCornerRadius(dp(40));
+                    indicator.setBackground(indicatorBg);
+                    LinearLayout.LayoutParams indParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+                    indParams.weight = 1;
+                    // We manage indicator position manually via x/width, so use absolute
+                    // Actually we overlay it using a FrameLayout trick below
+
+                    // Re-structure: use a FrameLayout so indicator can overlay
+                    FrameLayout pillFrame = new FrameLayout(this);
+                    pillFrame.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                    // Replace pill children with pillFrame
+                    pill.addView(pillFrame, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                    // Indicator inside pillFrame
+                    FrameLayout.LayoutParams indFp = new FrameLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+                    pillFrame.addView(indicator, indFp);
+
+                    // --- Tab buttons row inside pillFrame ---
+                    LinearLayout tabRow = new LinearLayout(this);
+                    tabRow.setOrientation(LinearLayout.HORIZONTAL);
+                    tabRow.setLayoutParams(new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                    pillFrame.addView(tabRow);
+
+                    int[] ICONS = {
+                        android.R.drawable.ic_menu_compass,
+                        android.R.drawable.ic_menu_search,
+                        android.R.drawable.ic_menu_my_calendar
+                    };
+
+                    final String[] tabUrls = new String[count];
+                    final View[] tabViews = new View[count];
+
+                    for (int i = 0; i < count; i++) {
                         JSONObject item = navItems.getJSONObject(i);
                         String label = item.getString("label");
-                        String path = item.getString("path");
-                        // Ignoring specific icons for simplicity, using a default icon or parsing if needed
-                        MenuItem menuItem = menu.add(0, i, 0, label);
-                        menuItem.setIcon(android.R.drawable.ic_menu_compass);
+                        tabUrls[i] = item.getString("path"); // ✅ store full URL directly
+
+                        LinearLayout tab = new LinearLayout(this);
+                        tab.setOrientation(LinearLayout.VERTICAL);
+                        tab.setGravity(Gravity.CENTER);
+                        tab.setClickable(true);
+                        tab.setFocusable(true);
+                        tab.setId(View.generateViewId());
+
+                        // Ripple / touch feedback
+                        TypedValue outValue = new TypedValue();
+                        getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true);
+                        tab.setBackgroundResource(outValue.resourceId);
+
+                        LinearLayout.LayoutParams tabLp = new LinearLayout.LayoutParams(
+                            0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+                        tab.setLayoutParams(tabLp);
+
+                        ImageView icon = new ImageView(this);
+                        icon.setImageResource(ICONS[i]);
+                        icon.setColorFilter(Color.parseColor("#6B7280")); // default grey
+                        icon.setLayoutParams(new LinearLayout.LayoutParams(dp(22), dp(22)));
+                        tab.addView(icon);
+
+                        TextView lbl = new TextView(this);
+                        lbl.setText(label);
+                        lbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+                        lbl.setTextColor(Color.parseColor("#6B7280"));
+                        lbl.setGravity(Gravity.CENTER);
+                        LinearLayout.LayoutParams lblLp = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        lblLp.topMargin = dp(3);
+                        tab.addView(lbl, lblLp);
+
+                        tabRow.addView(tab);
+                        tabViews[i] = tab;
                     }
-                    
-                    bottomNav.setOnItemSelectedListener(item -> {
-                        try {
-                            JSONObject navItem = navItems.getJSONObject(item.getItemId());
-                            String path = navItem.getString("path");
-                            webView.loadUrl(BuildConfig.WEB_URL + path);
-                        } catch (Exception e) {}
-                        return true;
+
+                    // --- Helper to animate indicator ---
+                    final int[] activeTab = {0};
+
+                    Runnable updateIndicator = new Runnable() {
+                        @Override public void run() {
+                            View t = tabViews[activeTab[0]];
+                            float targetX = t.getLeft();
+                            float targetW = t.getWidth();
+
+                            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) indicator.getLayoutParams();
+                            float fromX = indicator.getTranslationX();
+                            float fromW = lp.width == 0 ? targetW : lp.width;
+
+                            ValueAnimator anim = ValueAnimator.ofFloat(0f, 1f);
+                            anim.setDuration(250);
+                            anim.addUpdateListener(a -> {
+                                float f = (float) a.getAnimatedValue();
+                                indicator.setTranslationX(fromX + (targetX - fromX) * f);
+                                lp.width = (int)(fromW + (targetW - fromW) * f);
+                                indicator.setLayoutParams(lp);
+                            });
+                            anim.start();
+                        }
+                    };
+
+                    // Colour helpers
+                    int activeColor  = Color.parseColor("#3B82F6");
+                    int inactiveColor = Color.parseColor("#6B7280");
+
+                    Runnable refreshColors = () -> {
+                        for (int j = 0; j < count; j++) {
+                            LinearLayout tab = (LinearLayout) tabViews[j];
+                            ImageView ic  = (ImageView) tab.getChildAt(0);
+                            TextView  tx  = (TextView)  tab.getChildAt(1);
+                            boolean sel = (j == activeTab[0]);
+                            ic.setColorFilter(sel ? activeColor : inactiveColor);
+                            tx.setTextColor(sel ? activeColor : inactiveColor);
+                        }
+                    };
+
+                    // Click listeners for each tab
+                    for (int i = 0; i < count; i++) {
+                        final int idx = i;
+                        tabViews[i].setOnClickListener(v -> {
+                            activeTab[0] = idx;
+                            refreshColors.run();
+                            updateIndicator.run();
+                            // ✅ Use the path URL directly — no concatenation!
+                            webView.loadUrl(tabUrls[idx]);
+                        });
+                    }
+
+                    // Init indicator position after layout
+                    tabRow.post(() -> {
+                        refreshColors.run();
+                        View first = tabViews[0];
+                        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) indicator.getLayoutParams();
+                        lp.width = first.getWidth();
+                        indicator.setTranslationX(first.getLeft());
+                        indicator.setLayoutParams(lp);
                     });
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                Log.e("NAV", "Bottom nav error", e);
+            }
         }
 
         setContentView(rootLayout);
@@ -189,6 +350,11 @@ public class MainActivity extends AppCompatActivity {
                 sendTokenToBackend(token);
             });
         }
+    }
+
+    /** Convert dp to pixels */
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     private void sendTokenToBackend(String token) {
