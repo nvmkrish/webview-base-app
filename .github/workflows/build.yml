@@ -75,7 +75,7 @@ jobs:
               "client_info": {
                 "mobilesdk_app_id": "1:123456789:android:123456789",
                 "android_client_info": {
-                  "package_name": "com.example.webviewapp"
+                  "package_name": "com.easyway.app"
                 }
               },
               "oauth_client": [],
