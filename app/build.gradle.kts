@@ -8,7 +8,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.myapp.webview"
+        applicationId = "com.easyway.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
