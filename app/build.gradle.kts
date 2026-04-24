@@ -8,26 +8,26 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.myapp.webview"
+        applicationId = "com.easyway.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         // 🔴 THIS IS REQUIRED
-        buildConfigField("String", "WEB_URL", "\"https://claude.ai/\"")
-        buildConfigField("String", "SPLASH_COLOR", "\"#000000\"")
+        buildConfigField("String", "WEB_URL", "\"https://www.urbanmonkey.com/\"")
+        buildConfigField("String", "SPLASH_COLOR", "\"#ffffff\"")
         buildConfigField("String", "SPLASH_LOGO_URL", "\"\"")
-        buildConfigField("String", "SPLASH_TEXT", "\"Claude AI\"")
+        buildConfigField("String", "SPLASH_TEXT", "\"Urban Monkey\"")
         buildConfigField("Boolean", "ENABLE_PUSH", "true")
         buildConfigField("Boolean", "ENABLE_BOTTOM_NAV", "true")
         buildConfigField("Boolean", "ENABLE_CAMERA", "false")
         buildConfigField("Boolean", "ENABLE_LOCATION", "false")
         buildConfigField("Boolean", "ENABLE_SHARE", "false")
-        buildConfigField("String", "NAV_ITEMS_JSON", "\"[{\\\"label\\\":\\\"Home\\\",\\\"path\\\":\\\"https://claude.ai/new\\\"},{\\\"label\\\":\\\"Chats\\\",\\\"path\\\":\\\"https://claude.ai/recents\\\"},{\\\"label\\\":\\\"Accounts\\\",\\\"path\\\":\\\"https://claude.ai/settings/general\\\"}]\"")
-        buildConfigField("String", "APP_ID", "\"claude\"")
+        buildConfigField("String", "NAV_ITEMS_JSON", "\"[{\\\"label\\\":\\\"Home\\\",\\\"path\\\":\\\"https://www.urbanmonkey.com/\\\"},{\\\"label\\\":\\\"Collection\\\",\\\"path\\\":\\\"https://www.urbanmonkey.com/collections/all\\\"},{\\\"label\\\":\\\"About Us\\\",\\\"path\\\":\\\"https://www.urbanmonkey.com/pages/about-us\\\"}]\"")
+        buildConfigField("String", "APP_ID", "\"urbanmonkey\"")
         buildConfigField("String", "BACKEND_URL", "\"https://jacquie-unevocable-adaline.ngrok-free.dev\"")
-        buildConfigField("String", "APP_NAME", "\"Claude\"")
+        buildConfigField("String", "APP_NAME", "\"Urban Monkey\"")
 
     }
 
